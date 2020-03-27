@@ -64,12 +64,24 @@ func print_cal(day int) {
   }
 }
 
+func print_ical_buddy() {
+  out, err := exec.Command("icalBuddy", "eventsToday").Output()
+  if err != nil {
+    fmt.Println(err.Error())
+    return
+  }
+
+  fmt.Printf("%s", out)
+}
+
 func main() {
   info()
   commands()
 
   _, _, day := time.Now().Date()
   print_cal(day)
+
+  print_ical_buddy()
 
   error := app.Run(os.Args)
   if error != nil {
