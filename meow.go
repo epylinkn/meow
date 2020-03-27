@@ -2,8 +2,9 @@ package main
 
 import (
   "fmt"
-  "log"
-  "os"
+  "io/ioutil"
+  _ "log"
+  "net/http"
   "os/exec"
   "strings"
   "regexp"
@@ -60,7 +61,7 @@ func print_cal(day int) {
       continue
     }
 
-    fmt.Println(lines[i])
+    fmt.Printf("%s\n", lines[i])
   }
 }
 
@@ -71,20 +72,45 @@ func print_ical_buddy() {
     return
   }
 
-  fmt.Printf("%s", out)
+  fmt.Printf("%s\n", out)
+}
+
+func print_wttr() {
+  client := &http.Client{}
+  req, err := http.NewRequest("GET", "https://wttr.in?1nqF", nil)
+  if err != nil {
+    fmt.Printf("%s", err)
+    return
+  }
+
+  req.Header.Set("User-Agent", "curl/7.60.0")
+  res, err := client.Do(req)
+  if err != nil {
+    fmt.Printf("%s", err)
+    return
+  }
+
+  defer res.Body.Close()
+  contents, err := ioutil.ReadAll(res.Body)
+  if err != nil {
+    fmt.Printf("%s", err)
+    return
+  }
+
+  fmt.Printf("%s\n", string(contents))
 }
 
 func main() {
-  info()
-  commands()
+  // info()
+  // commands()
 
   _, _, day := time.Now().Date()
+  print_wttr()
   print_cal(day)
-
   print_ical_buddy()
 
-  error := app.Run(os.Args)
-  if error != nil {
-    log.Fatal(error)
-  }
+  // error := app.Run(os.Args)
+  // if error != nil {
+  //   log.Fatal(error)
+  // }
 }
